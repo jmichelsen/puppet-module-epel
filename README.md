@@ -1,15 +1,38 @@
+# History
+
+Michael Stahnke wrote [puppet-module-epel](https://github.com/stahnma/puppet-module-epel).
+Lee Boynton followed up with [puppet-rpmforge](https://github.com/lboynton/puppet-rpmforge)
+which has a dependancy on `puppet-module-epel` for a fact and rpm key
+importing.
+
+It seems like managing third party repos is a common task. If we're going to
+have a cross module dependancy we might as well merge the modules.
+
+# Why?
+
+EPEL and RepoForge are two common third party RPM repositories. To parrot
+Michael Stahnke,  "I just got sick of coding Puppet modules and basically
+having an assumption that EPEL was setup or installed.  I can now depend on
+this module instead."
+
+There are also some packages which don't play nicely between the two
+(nagios-plugins comes to mind) and when possible that has been captured here.
+
 # Configure EPEL (Extra Repository for Enterprise Linux)
 
-# About
-This module basically just mimics the epel-release rpm. The same repos are
-enabled/disabled and the GPG key is imported.  In the end you will end up with
-the EPEL repos configured.
+`include rpmrepos::epel`
+
+## About
+This module basically just mimics the epel-release rpm. The same
+repos are enabled/disabled and the GPG key is imported.  In the end you will
+end up with the EPEL repos configured.
 
 The following Repos will be setup and enabled by default:
 
   * epel
 
-Other repositories that will setup but disabled (as per the epel-release setup)
+Other repositories that will setup but disabled (as per the epel-release
+setup)
 
   * epel-debuginfo
   * epel-source
@@ -17,70 +40,51 @@ Other repositories that will setup but disabled (as per the epel-release setup)
   * epel-testing-debuginfo
   * epel-testing-source
 
-# Proxy
-If you have an http proxy required to access the internet, you can use either
-a class parameter in the _epel_ class, or edit the $proxy variable in the
-params.pp file. By default no proxy is assumed.
+You can enable them using class parameters (`testing => true`).
 
-# Why?
-I am a big fan of EPEL. I actually was one of the people who helped get it
-going. I am also the owner of the epel-release package, so in general this
-module should stay fairly up to date with the official upstream package.
+## Proxy
+If you have an http proxy required to access the internet, you can
+use the $proxy variable in the class parameters. If it is set to a value other
+than 'absent' a proxy will be setup with each repository.  Note that otherwise
+each of the repos will fall back to settings in the /etc/yum.conf file.
 
-I just got sick of coding Puppet modules and basically having an assumption
-that EPEL was setup or installed.  I can now depend on this module instead.
+# Configure RepoForge
 
-I realize it is fairly trivial to get EPEL setup. Every now-and-then however
-the path to epel-release changes because something changes in the package (mass
-rebuild, rpm build macros updates, etc).  This  module will bypass the changing
-URL and just setup the package mirrors.
+`include rpmrepos::rpmforge`
 
-This does mean that if you are looking for RPM macros that are normally
-included with EPEL release, this will not have them.
+## About
+This module basically just mimics the rpmforge-release rpm. The same
+repos are enabled/disabled and the GPG key is imported.  In the end you will
+end up with the RepoForge (aka RPMForge) repos configured.
+
+The following Repos will be setup and enabled by default:
+
+  * rpmforge
+
+Other repositories that will setup but disabled (as per the rpmforge-release
+setup)
+
+  * rpmforge-extras
+  * rpmforge-testing
+
+You can enable them using class parameters (`testing => '1'`).
+
+## Proxy
+If you have an http proxy required to access the internet, you can
+use the $proxy variable in the class parameters. If it is set to a value other
+than 'absent' a proxy will be setup with each repository.  Note that otherwise
+each of the repos will fall back to settings in the /etc/yum.conf file.
 
 # Futher Information
 
 * [EPEL Wiki](http://fedoraproject.org/wiki/EPEL)
 * [epel-release package information](http://mirrors.servercentral.net/fedora/epel/6/i386/repoview/epel-release.html)
+* [RepoForge](http://repoforge.org/use/)
 
 # Testing
 
-* This is commonly used on Puppet Enterprise 2.x and 3.x
-* This was tested using Puppet 2.7.x on Centos5/6
-* This was tested using Puppet 3.1.1 on Amazon's AWS Linux
-* I assume it will work on any RHEL variant
-* Also, I think this should work with earlier versions of Puppet (2.6.x at least)
+* This was tested using Puppet 2.7.x on Centos5/6 I assume it will work on any
+* RHEL variant Also, I think this should work with earlier versions of Puppet
+* (2.6.x at least)
 
-## Unit tests
-
-Install the necessary gems
-
-    bundle install
-
-Run the RSpec and puppet-lint tests
-
-    bundle exec rake ci
-    
-## System tests
-
-If you have Vagrant >=1.1.0 you can also run system tests:
-
-    RSPEC_SET=centos-64-x64 bundle exec rake spec:system
-
-Available RSPEC_SET options are in .nodeset.yml
-
-# License
-Apache Software License 2.0
-
-# Author/Contributors
-  *  Chad Metcalf <metcalfc@gmail.com>
-  *  Joseph Swick <joseph.swick@meltwater.com>
-  *  Matthaus Owens <mlitteken@gmail.com>
-  *  Michael Stahnke <stahnma@puppetlabs.com>
-  *  Michael Stahnke <stahnma@websages.com>
-  *  Pro Cabales <proletaryo@gmail.com>
-  *  Proletaryo Cabales <proletaryo@gmail.com>
-  *  Stefan Goethals <stefan@zipkid.eu>
-  *  Tim Rupp <caphrim007@gmail.com>
-  *  Troy Bollinger <troy@us.ibm.com>
-  *  Vlastimil Holer <holer@ics.muni.cz>
+# License Apache Software License 2.0
